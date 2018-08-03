@@ -1,10 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
+
+html {
+  overflow-y: scroll !important;
+}
+
 body * {
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
 body {
   background-color: orange;
+  margin-left: calc(100vw - 100%);
 }
 
 h1 {
@@ -19,7 +25,7 @@ h1 {
   margin: 20px 5px;
 }
 
-.card > div {
+.card>div {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -30,8 +36,38 @@ i {
   font-style: italic;
 }
 
-@media(min-width: 1300px){
-  div {
+input {
+  border: 1px solid #757575;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 2px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+}
+
+button {
+  background-color: #cacaca;
+  color: #333333;
+  border: none;
+  padding: 3px 10px;
+}
+
+a {
+  color: black;
+  text-decoration: none;
+}
+
+a:hover {
+  color: darkblue;
+}
+
+#echart-bar {
+  height: 400px;
+}
+
+@media(min-width: 1300px) {
+  .card {
     display: inline-block;
     width: 45%;
   }
