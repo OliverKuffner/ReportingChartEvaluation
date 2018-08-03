@@ -62,7 +62,7 @@ a:hover {
   color: darkblue;
 }
 
-#echart-bar {
+#echart-bar, #echart-pie {
   height: 400px;
 }
 

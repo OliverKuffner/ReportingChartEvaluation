@@ -44,7 +44,7 @@ export class AppComponent implements AfterViewInit, OnInit {
     if (!value) {
       return;
     }
-    const labels = (<any[]>value.results).map(({ label }) => label);
+    const labels = (<any[]>value.results).map(({ name }) => name);
     const colors = (<any[]>value.results).map(({ color }) => color);
     const amounts = (<any[]>value.results).map(({ value }) => value);
 
@@ -127,7 +127,7 @@ export class AppComponent implements AfterViewInit, OnInit {
       datasets.push({
         data: data,
         backgroundColor: this.getTransparentColor(this.getRandomColor(), 0.5),
-        label: value.labels[i++]
+        label: value.names[i++]
       });
 
     });
@@ -138,6 +138,9 @@ export class AppComponent implements AfterViewInit, OnInit {
       data: {
         labels: value.attributes,
         datasets: datasets
+      },
+      options: {
+        title: { text: 'Programs looked at', display: true }
       }
     });
   }
@@ -147,16 +150,18 @@ export class AppComponent implements AfterViewInit, OnInit {
       return;
     }
     const barChart = this.echarts.init(document.getElementById('echart-bar'));
-    const labels = (<any[]>value.results).map(({ label }) => label);
-    const amounts = (<any[]>value.results).map(({ value }) => value);
-    const colors = (<any[]>value.results).map(({ color }) => color);
 
-    const option = {
+    const labels = (<any[]>value.results).map(({ name }) => name);
+    const amounts = (<any[]>value.results).map(({ value }) => value);
+    const previousAmounts = amounts.map(a => { return Math.abs(a + this.getRandomNumber(-5, 5)) });
+
+    const barOptions = {
       tooltip: {
         show: true
       },
       legend: {
-        data: [value.name]
+        data: [value.name + ' 2017',
+        value.name + ' 2018']
       },
       xAxis: [
         {
@@ -171,25 +176,94 @@ export class AppComponent implements AfterViewInit, OnInit {
       ],
       series: [
         {
-          "name": value.name,
+          "name": value.name + ' 2017',
           "type": "bar",
-          "data": amounts
+          "data": previousAmounts,
         },
         {
-          "name": value.name,
+          "name": value.name + ' 2018',
           "type": "bar",
           "data": amounts
         }
       ],
-      color: [ 
-        '#ff7f50', '#87cefa', '#da70d6', '#32cd32', '#6495ed', 
-        '#ff69b4', '#ba55d3', '#cd5c5c', '#ffa500', '#40e0d0', 
-        '#1e90ff', '#ff6347', '#7b68ee', '#00fa9a', '#ffd700', 
-        '#6b8e23', '#ff00ff', '#3cb371', '#b8860b', '#30e0e0' 
-    ]
+      color: ['#fecea0', '#b0a1e0']
     };
 
-    barChart.setOption(option);
+    barChart.setOption(barOptions);
+
+    const pieChart = this.echarts.init(document.getElementById('echart-pie'));
+    const pieOptions = {
+      tooltip: {
+        show: true
+      },
+      legend: {
+        data: [value.name + ' 2017',
+        value.name + ' 2018']
+      },
+      series: [
+        {
+          "name": value.name + ' 2017',
+          "type": "pie",
+          "data": previousAmounts,
+        },
+        {
+          "name": value.name + ' 2018',
+          "type": "pie",
+          "data": amounts
+        }
+      ],
+      color: ['#fecea0', '#b0a1e0']
+    };
+
+    let option = {
+      title: {
+        text: value.name,
+        subtext: '2018',
+        x: 'center'
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: "{a} <br/>{b} : {c} ({d}%)"
+      },
+      legend: {
+        orient: 'vertical',
+        x: 'left',
+        data: labels
+      },
+      toolbox: {
+        show: true,
+        feature: {
+          mark: { show: true },
+          dataView: { show: true, readOnly: false },
+          magicType: {
+            show: true,
+            type: ['pie', 'funnel'],
+            option: {
+              funnel: {
+                x: '25%',
+                width: '50%',
+                funnelAlign: 'left',
+                max: 1548
+              }
+            }
+          },
+          restore: { show: true },
+          saveAsImage: { show: true }
+        }
+      },
+      calculable: true,
+      series: [
+        {
+          name: '访问来源',
+          type: 'pie',
+          radius: '55%',
+          center: ['50%', '60%'],
+          data: value.results
+        }
+      ]
+    };
+
+    pieChart.setOption(option);
   }
 
   addToPieChart(name: string, amount: number) {

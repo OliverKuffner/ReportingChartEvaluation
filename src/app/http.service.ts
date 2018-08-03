@@ -9,27 +9,27 @@ export class HttpService {
     name: 'Lieblingseis',
     results: [
       {
-        label: 'Vanille',
+        name: 'Vanille',
         value: this.getRandomNumber(5, 12),
         color: 'rgb(255, 206, 86)'
       },
       {
-        label: 'Schokolade',
+        name: 'Schokolade',
         value: this.getRandomNumber(6, 12),
         color: 'rgb(74, 48, 0)'
       },
       {
-        label: 'Erdbeer',
+        name: 'Erdbeer',
         value: this.getRandomNumber(3, 8),
         color: 'rgb(255, 99, 132)'
       },
       {
-        label: 'Zitrone',
+        name: 'Zitrone',
         value: this.getRandomNumber(2, 8),
         color: 'rgb(255, 250, 59)'
       },
       {
-        label: 'Schlumpf',
+        name: 'Schlumpf',
         value: this.getRandomNumber(1, 4),
         color: 'rgb(54, 162, 235)'
       }
@@ -41,7 +41,7 @@ export class HttpService {
   private developerValues = {
     attributes: this.developerAttributes,
     values: [this.generateDeveloperValues(), this.shuffleArray(this.generateDeveloperValues())],
-    labels: ['Frontend Developer', 'Backend Developer']
+    names: ['Frontend Developer', 'Backend Developer']
   };
 
   public getIceCreamValues() {
