@@ -1,1 +1,38 @@
 /* You can add global styles to this file, and also import other style files */
+body * {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body {
+  background-color: orange;
+}
+
+h1 {
+  text-decoration: underline;
+  text-decoration-style: dashed;
+}
+
+.card {
+  background-color: white;
+  box-shadow: 0 0 5px darkblue;
+  padding: 15px;
+  margin: 20px 5px;
+}
+
+.card > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+i {
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+@media(min-width: 1300px){
+  div {
+    display: inline-block;
+    width: 45%;
+  }
+}
