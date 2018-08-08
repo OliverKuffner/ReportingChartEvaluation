@@ -43,7 +43,6 @@ input {
     border-right: 0;
     border-radius: 2px;
     margin-right: 5px;
-    margin-bottom: 10px;
 }
 
 button {
@@ -51,6 +50,7 @@ button {
   color: #333333;
   border: none;
   padding: 3px 10px;
+  margin-bottom: 10px;
 }
 
 a {
@@ -62,7 +62,7 @@ a:hover {
   color: darkblue;
 }
 
-#echart-bar, #echart-pie {
+.echarts {
   height: 400px;
 }
 

@@ -75,7 +75,6 @@ export class HttpService {
     ];
   }
 
-  // TODO
   private getRandomPercentages(amount: number): number[] {
     const percentages = [];
     let sum = 0;

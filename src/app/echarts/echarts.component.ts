@@ -10,6 +10,9 @@ import { ECharts, EChartOption } from 'echarts'
 })
 export class EchartsComponent implements AfterViewInit, OnInit {
 
+  private radarChart: ECharts;
+  private isCircleRadar = false;
+
   constructor(private httpService: HttpService, private helper: HelperService) { }
 
   ngOnInit() {
@@ -26,6 +29,18 @@ export class EchartsComponent implements AfterViewInit, OnInit {
     });
   }
 
+  toggleRadarChartMode(){
+    const options: EChartOption = {
+      polar: [
+        {
+          type: this.isCircleRadar ? 'polygon' : 'circle',
+          splitNumber: this.isCircleRadar ? 5 : 9
+        }
+      ],
+    };
+    this.isCircleRadar = !this.isCircleRadar;
+    this.radarChart.setOption(options);
+  }
 
   private initIceCharts(value: any) {
     if (!value) {
@@ -34,16 +49,18 @@ export class EchartsComponent implements AfterViewInit, OnInit {
     const barChart = echarts.init(document.querySelector('div#echart-bar'));
 
     const labels = (<any[]>value.results).map(({ name }) => name);
+    const colors = (<any[]>value.results).map(({ color }) => color);
     const amounts = (<any[]>value.results).map(({ value }) => value);
     const previousAmounts = amounts.map(a => { return Math.abs(a + this.helper.getRandomNumber(-5, 5)) });
 
     const barOptions: EChartOption = {
       tooltip: {
-        show: true
+        show: true,
+        trigger: 'axis'
       },
       legend: {
         data: [value.name + ' 2017',
-        value.name + ' 2018']
+        value.name + ' 2018', 'Durchschnitt']
       },
       xAxis: [
         {
@@ -53,24 +70,32 @@ export class EchartsComponent implements AfterViewInit, OnInit {
       ],
       yAxis: [
         {
-          type: 'value'
+          type: 'value',
+          name: 'Anzahl Personen'
         }
       ],
       series: [
         {
-          "name": value.name + ' 2017',
-          "type": "bar",
-          "data": previousAmounts,
+          name: value.name + ' 2017',
+          type: "bar",
+          data: previousAmounts,
         },
         {
-          "name": value.name + ' 2018',
-          "type": "bar",
-          "data": amounts
+          name: value.name + ' 2018',
+          type: "bar",
+          data: amounts
+        },
+        {
+          name: 'Durchschnitt',
+          type: 'line',
+          data: this.helper.createProcessData(previousAmounts, amounts),
+          // yAxisIndex: 0
         }
       ],
-      color: ['#fecea0', '#b0a1e0']
+      color: ['#fecea0', '#b0a1e0', 'gray']
     };
     barChart.setOption(barOptions);
+    
 
     const pieChart = echarts.init(document.querySelector('div#echart-pie'));
     let pieOptions: EChartOption = {
@@ -80,6 +105,7 @@ export class EchartsComponent implements AfterViewInit, OnInit {
         padding: 120, // fix for missing property x
         // x: 'center' // not yet in @types/echarts
       },
+      color: colors,
       tooltip: {
         trigger: 'item',
         formatter: "{a} <br/>{b} : {c} ({d}%)"
@@ -93,30 +119,15 @@ export class EchartsComponent implements AfterViewInit, OnInit {
         show: true,
         feature: {
           mark: {
-            show: true,
-            title: {
-              mark: 'Linie zeichnen',
-              markUndo: 'Letzte Linie entfernen',
-              markClear: 'Alle Linien löschen'
-            }
+            show: true
           },
           dataView: {
             show: true,
-            readOnly: false,
-            // title: 'Datenansicht', // configured in app component
-            lang: [
-              'Datenansicht',
-              'Schließen',
-              'Neu laden'
-            ]
+            readOnly: false
           },
           magicType: {
             show: true,
             type: ['pie', 'funnel'],
-            title: {
-              pie: 'Kuchendiagram',
-              funnel: 'Trichteransicht'
-            },
             option: {
               funnel: {
                 x: '25%',
@@ -126,11 +137,9 @@ export class EchartsComponent implements AfterViewInit, OnInit {
               }
             }
           },
-          restore: { show: true, title: 'Neu laden' },
+          restore: { show: true },
           saveAsImage: {
-            show: true,
-            title: 'Als Bild speichern',
-            lang: ['Speichern']
+            show: true
           }
         }
       },
@@ -153,6 +162,62 @@ export class EchartsComponent implements AfterViewInit, OnInit {
       return;
     }
 
+    this.radarChart = echarts.init(document.querySelector('div#echart-radar'));
+    const radarOptions: EChartOption = {
+      title: {
+        text: 'Programs looked at',
+        subtext: 'in %'
+      },
+      color: [this.helper.getRandomColor(), this.helper.getRandomColor()],
+      tooltip: {
+        trigger: 'axis'
+      },
+      legend: {
+        x: 'center',
+        data: value.names
+      },
+      toolbox: {
+        show: true,
+        feature: {
+          mark: { show: true },
+          dataView: { show: true, readOnly: true },
+          restore: { show: true },
+          saveAsImage: { show: true }
+        }
+      },
+      polar: [
+        {
+          indicator: value.attributes.map(a => {
+            return { text: a };
+          }),
+          radius: 140 // px
+        }
+      ],
+      series: [
+        {
+          name: 'Programs looked at',
+          type: 'radar',
+          itemStyle: {
+            normal: {
+              areaStyle: {
+                type: 'default'
+              }
+            }
+          },
+          data: [
+            {
+              value: value.values[0],
+              name: value.names[0]
+            },
+            {
+              value: value.values[1],
+              name: value.names[1]
+            }
+          ]
+        }
+      ]
+    };
+    this.radarChart.setOption(radarOptions);
   }
 
 }
