@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { HttpService } from '../http.service';
 import { HelperService } from '../helper.service';
-// TODO install @types for echarts if they exist
+import { ECharts, EChartOption } from 'echarts'
 
 @Component({
   selector: 'app-echarts',
@@ -9,8 +9,6 @@ import { HelperService } from '../helper.service';
   styleUrls: ['./echarts.component.css']
 })
 export class EchartsComponent implements AfterViewInit, OnInit {
-
-  private echarts = window['echarts'];
 
   constructor(private httpService: HttpService, private helper: HelperService) { }
 
@@ -22,6 +20,10 @@ export class EchartsComponent implements AfterViewInit, OnInit {
     this.httpService.iceValues.subscribe(value => {
       this.initIceCharts(value);
     });
+
+    this.httpService.developerValues.subscribe(value => {
+      this.initDevCharts(value);
+    });
   }
 
 
@@ -29,13 +31,13 @@ export class EchartsComponent implements AfterViewInit, OnInit {
     if (!value) {
       return;
     }
-    const barChart = this.echarts.init(document.getElementById('echart-bar'));
+    const barChart = echarts.init(document.querySelector('div#echart-bar'));
 
     const labels = (<any[]>value.results).map(({ name }) => name);
     const amounts = (<any[]>value.results).map(({ value }) => value);
     const previousAmounts = amounts.map(a => { return Math.abs(a + this.helper.getRandomNumber(-5, 5)) });
 
-    const barOptions = {
+    const barOptions: EChartOption = {
       tooltip: {
         show: true
       },
@@ -68,16 +70,15 @@ export class EchartsComponent implements AfterViewInit, OnInit {
       ],
       color: ['#fecea0', '#b0a1e0']
     };
-
     barChart.setOption(barOptions);
 
-    // TODO locale for toolbox
-    const pieChart = this.echarts.init(document.getElementById('echart-pie'));
-    let pieOptions = {
+    const pieChart = echarts.init(document.querySelector('div#echart-pie'));
+    let pieOptions: EChartOption = {
       title: {
         text: value.name,
         subtext: '2018',
-        x: 'center'
+        padding: 120, // fix for missing property x
+        // x: 'center' // not yet in @types/echarts
       },
       tooltip: {
         trigger: 'item',
@@ -91,25 +92,49 @@ export class EchartsComponent implements AfterViewInit, OnInit {
       toolbox: {
         show: true,
         feature: {
-          mark: { show: true },
-          dataView: { show: true, readOnly: false },
+          mark: {
+            show: true,
+            title: {
+              mark: 'Linie zeichnen',
+              markUndo: 'Letzte Linie entfernen',
+              markClear: 'Alle Linien löschen'
+            }
+          },
+          dataView: {
+            show: true,
+            readOnly: false,
+            // title: 'Datenansicht', // configured in app component
+            lang: [
+              'Datenansicht',
+              'Schließen',
+              'Neu laden'
+            ]
+          },
           magicType: {
             show: true,
             type: ['pie', 'funnel'],
+            title: {
+              pie: 'Kuchendiagram',
+              funnel: 'Trichteransicht'
+            },
             option: {
               funnel: {
                 x: '25%',
                 width: '50%',
                 funnelAlign: 'left',
-                max: 1548
+                max: amounts.reduce((a, b) => a + b, 0)
               }
             }
           },
-          restore: { show: true },
-          saveAsImage: { show: true }
+          restore: { show: true, title: 'Neu laden' },
+          saveAsImage: {
+            show: true,
+            title: 'Als Bild speichern',
+            lang: ['Speichern']
+          }
         }
       },
-      calculable: true,
+      // calculable: true, // not yet in @types/echarts
       series: [
         {
           name: value.name,
@@ -120,8 +145,14 @@ export class EchartsComponent implements AfterViewInit, OnInit {
         }
       ]
     };
-
     pieChart.setOption(pieOptions);
+  }
+
+  private initDevCharts(value: any) {
+    if (!value) {
+      return;
+    }
+
   }
 
 }

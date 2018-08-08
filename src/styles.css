@@ -66,6 +66,10 @@ a:hover {
   height: 400px;
 }
 
+#dummy {
+  display: none;
+}
+
 @media(min-width: 1300px) {
   .card {
     display: inline-block;
