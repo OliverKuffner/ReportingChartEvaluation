@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Observable } from '../../node_modules/rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HttpService {
-  private iceValues = {
+  iceValues = new BehaviorSubject(null);
+  developerValues = new BehaviorSubject(null);
+
+  private iceFakeValues = {
     name: 'Lieblingseis',
     results: [
       {
@@ -36,28 +39,28 @@ export class HttpService {
     ]
   };
 
-  private developerAttributes = ['Browser', 'Chat', 'Console', 'Email client', 'File explorer', 'IDE'];
+  private developerFakeAttributes = ['Browser', 'Chat', 'Console', 'Email client', 'File explorer', 'IDE'];
 
-  private developerValues = {
-    attributes: this.developerAttributes,
+  private developerFakeValues = {
+    attributes: this.developerFakeAttributes,
     values: [this.generateDeveloperValues(), this.shuffleArray(this.generateDeveloperValues())],
     names: ['Frontend Developer', 'Backend Developer']
   };
 
   public getIceCreamValues() {
-    return this.getDeferredObservable(this.iceValues);
+    setTimeout(() => {
+      this.iceValues.next(this.iceFakeValues);
+    }, this.getRandomNumber(500, 1500));
+
+    return this.iceValues.asObservable();
   }
 
   public getDeveloperValues() {
-    return this.getDeferredObservable(this.developerValues);
-  }
+    setTimeout(() => {
+      this.developerValues.next(this.developerFakeValues);
+    }, this.getRandomNumber(500, 1500));
 
-  private getDeferredObservable<T>(value: T): Observable<T> {
-    return Observable.create(observer => {
-      setTimeout(() => {
-        observer.next(value);
-      }, this.getRandomNumber(500, 1500));
-    });
+    return this.iceValues.asObservable();
   }
 
   private getRandomNumber(min: number, max: number): number {
